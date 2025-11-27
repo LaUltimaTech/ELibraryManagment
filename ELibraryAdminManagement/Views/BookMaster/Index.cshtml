@@ -1,0 +1,346 @@
+﻿@model IEnumerable<ELibraryAdminManagement.Models.BookMaster>
+@{
+    ViewData["Title"] = "Books";
+    Layout = "_Layout";
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Books</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            padding-top: 60px;
+            background: linear-gradient(to bottom right, #f8f9fa, #ffffff);
+            min-height: 100vh;
+        }
+
+        .navbar-text {
+            font-weight: bold;
+        }
+
+        .orange-bar {
+            background: linear-gradient(90deg, #ff7f11, #ff9f1c);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .card {
+            background-color: #fff;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+            border: none;
+            border-radius: 12px;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+        }
+
+        td {
+            vertical-align: middle;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP BAR -->
+    <nav class="navbar orange-bar fixed-top py-2">
+        <div class="container-fluid navbar-content">
+            <div style="width:80px;"></div>
+            <div class="navbar-title text-white fs-5">Book Management</div>
+            <div class="top-right-buttons">
+
+                <!-- EXPORT -->
+                <button class="btn btn-light btn-sm" title="Download Excel" onclick="downloadExcel()">
+                    <i class="bi bi-download fs-5"></i>
+                </button>
+
+                <!-- IMPORT -->
+                <label for="uploadExcel" class="btn btn-light btn-sm mb-0" title="Upload Excel">
+                    <i class="bi bi-upload fs-5"></i>
+                </label>
+                <input type="file" id="uploadExcel" accept=".xlsx,.xls" hidden onchange="uploadExcel(event)">
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="container mt-5">
+
+        <!-- FORM -->
+        <div class="card">
+            <form id="bookForm" enctype="multipart/form-data" class="card p-4">
+                <h5 class="text-primary text-center mb-4">Add New Book</h5>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Book Name</label>
+                        <input type="text" class="form-control" name="Name" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Category</label>
+                        <select name="BookCategoryId" class="form-select" required>
+                            <option value="">-- Select Category --</option>
+                            @foreach (var cat in ViewBag.BookCategoryId as SelectList)
+                            {
+                                <option value="@cat.Value">@cat.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Cover Page</label>
+                        <input type="file" name="coverFile" class="form-control">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">PDF Book</label>
+                        <input type="file" name="pdfFile" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Audio (optional)</label>
+                        <input type="file" name="audioFile" class="form-control">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 mt-3">
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+
+
+        <!-- TABLE LIST -->
+        <div class="card p-4 mt-4">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle" id="bookTable">
+                    <thead>
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Book Name</th>
+                            <th>Cover</th>
+                            <th>Book View</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @{
+                            int srNo = 1;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr data-id="@item.Id">
+                                <td>@srNo</td>
+                                <td>@item.Name</td>
+
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.CoverPagePath))
+                                    {
+                                        <img src="~/@item.CoverPagePath" width="50" height="50" />
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.PdfPath))
+                                    {
+                                        <a href="~/@item.PdfPath" target="_blank" class="btn btn-info btn-sm">
+                                            <i class="bi bi-book"></i> View
+                                        </a>
+                                    }
+                                </td>
+
+                                <td>
+                                    <button class="btn btn-warning btn-sm btn-edit">
+                                        <i class="bi bi-pencil-square"></i> Update
+                                    </button>
+
+                                    <button class="btn btn-danger btn-sm btn-delete">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            srNo++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- EDIT MODAL -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="editForm" class="modal-content" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Book</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="Edit_Id">
+
+                    <div class="mb-3">
+                        <label>Book Name</label>
+                        <input type="text" class="form-control" name="Name" id="Edit_Name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Category</label>
+                        <select name="BookCategoryId" id="Edit_Category" class="form-select" required>
+                            <option value="">-- Select Category --</option>
+                            @foreach (var cat in ViewBag.BookCategoryId as SelectList)
+                            {
+                                <option value="@cat.Value">@cat.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Cover Page</label>
+                        <input type="file" class="form-control" name="coverFile">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>PDF File</label>
+                        <input type="file" class="form-control" name="pdfFile">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Audio File</label>
+                        <input type="file" class="form-control" name="audioFile">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-success" type="submit">Save Changes</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+    <!-- SCRIPTS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+
+        // CREATE BOOK
+        $("#bookForm").submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: '/BookMaster/Create',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    alert(res.message);
+                    if (res.success) location.reload();
+                }
+            });
+        });
+
+
+        // DELETE BOOK
+        $(document).on("click", ".btn-delete", function () {
+            if (!confirm("Are you sure?")) return;
+            var id = $(this).closest("tr").data("id");
+
+            $.ajax({
+                url: '/BookMaster/DeleteConfirmed/' + id,
+                type: 'POST',
+                success: function (res) {
+                    alert(res.message);
+                    if (res.success) location.reload();
+                }
+            });
+        });
+
+
+        // OPEN EDIT MODAL
+        $(document).on("click", ".btn-edit", function () {
+            var id = $(this).closest("tr").data("id");
+
+            $.get('/BookMaster/Get/' + id, function (data) {
+
+                $("#Edit_Id").val(data.id);
+                $("#Edit_Name").val(data.name);
+                $("#Edit_Category").val(data.bookCategoryId);
+
+                new bootstrap.Modal(document.getElementById("editModal")).show();
+
+            });
+        });
+
+
+        // SAVE EDIT
+        $("#editForm").submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: '/BookMaster/Edit',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    alert(res.message);
+                    if (res.success) location.reload();
+                }
+            });
+        });
+
+
+        // EXPORT
+        function downloadExcel() {
+            window.location.href = '/BookMaster/Export';
+        }
+
+        // IMPORT
+        function uploadExcel(e) {
+            var file = e.target.files[0];
+            var formData = new FormData();
+            formData.append("excelFile", file);
+
+            $.ajax({
+                url: '/BookMaster/Import',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    alert(res.message);
+                    if (res.success) location.reload();
+                }
+            });
+        }
+
+    </script>
+
+</body>
+</html>

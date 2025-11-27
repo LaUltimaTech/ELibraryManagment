@@ -1,0 +1,314 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>School</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            padding-top: 60px;
+            background: linear-gradient(to bottom right, #f8f9fa, #ffffff);
+            min-height: 100vh;
+        }
+
+        .navbar-text {
+            font-weight: bold;
+        }
+
+        .orange-bar {
+            background: linear-gradient(90deg, #ff7f11, #ff9f1c);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .card {
+            background-color: #fff;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+            border: none;
+            border-radius: 12px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #080808;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            height: 32px !important;
+            padding: 4px 8px !important;
+            font-size: 0.9rem !important;
+            border-radius: 6px !important;
+        }
+
+        textarea.form-control {
+            height: auto !important;
+        }
+
+        table {
+            margin-top: 25px;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+        }
+
+        td {
+            vertical-align: middle;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar orange-bar fixed-top py-2">
+        <div class="container justify-content-center">
+            <span class="navbar-text h5 text-white mb-0">Create New School</span>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+
+        <!-- FORM CARD -->
+        <div class="card">
+            <form class="card p-4" id="schoolForm">
+                <input type="hidden" id="Id">
+
+                <h5 class="text-primary mb-4">Enter School Details</h5>
+
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <label class="form-label">School Name</label>
+                        <input type="text" class="form-control" id="schoolName" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">School Code</label>
+                        <input type="text" class="form-control" id="schoolCode" maxlength="4" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <textarea class="form-control" id="address" rows="2" required></textarea>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">District</label>
+                        <input type="text" class="form-control" id="district" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">State</label>
+                        <input type="text" class="form-control" id="state" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Office Number</label>
+                        <input type="text" class="form-control" id="officeNumber" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Whatsapp Number</label>
+                        <input type="text" class="form-control" id="whatsappNumber" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="emailId" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Contact Person</label>
+                        <input type="text" class="form-control" id="contactPerson" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Contact Number</label>
+                        <input type="text" class="form-control" id="contactNumber" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Website</label>
+                        <input type="url" class="form-control" id="website" required>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Logo</label>
+                        <input type="file" class="form-control" id="LogoPath">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 mt-3">
+                    <button type="button" class="btn btn-primary" onclick="clearForm()">New</button>
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TABLE CARD -->
+        <div class="card p-4 mt-4">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead>
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Logo</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>City</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schoolTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JS: jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+
+        /* -------------------------
+           LOAD TABLE ON PAGE LOAD
+        --------------------------*/
+        $(document).ready(function () {
+            loadTable();
+        });
+
+        /* -------------------------
+                  LOAD TABLE
+        --------------------------*/
+        function loadTable() {
+            $.get("/SchoolMaster/GetAll", function (data) {
+                let rows = "";
+                let i = 1;
+
+                data.forEach(s => {
+                    rows += `
+                    <tr>
+                      <td>${i++}</td>
+                      <td><img src="/SchoolLogos/${s.logoPath ?? "noimg.png"}" width="45" class="rounded"></td>
+                      <td>${s.schoolCode}</td>
+                      <td>${s.schoolName}</td>
+                      <td>${s.city}</td>
+                      <td>
+                        <button class="btn btn-warning btn-sm" onclick="edit(${s.id})">Update</button>
+                        <button class="btn btn-danger btn-sm" onclick="remove(${s.id})">Delete</button>
+                      </td>
+                    </tr>`;
+                });
+
+                $("#schoolTable").html(rows);
+            });
+        }
+
+        /* -------------------------
+                  SAVE DATA
+        --------------------------*/
+        $("#schoolForm").submit(function (e) {
+            e.preventDefault();
+
+            let fd = new FormData();
+            fd.append("Id", $("#Id").val() || 0);
+            fd.append("SchoolName", $("#schoolName").val());
+            fd.append("SchoolCode", $("#schoolCode").val());
+            fd.append("Address", $("#address").val());
+            fd.append("City", $("#city").val());
+            fd.append("District", $("#district").val());
+            fd.append("State", $("#state").val());
+            fd.append("OfficeNumber", $("#officeNumber").val());
+            fd.append("WhatsappNumber", $("#whatsappNumber").val());
+            fd.append("EmailId", $("#emailId").val());
+            fd.append("ContactPerson", $("#contactPerson").val());
+            fd.append("ContactNumber", $("#contactNumber").val());
+            fd.append("Website", $("#website").val());
+
+            let file = $("#LogoPath")[0].files[0];
+            if (file) fd.append("LogoPath", file);
+
+            $.ajax({
+                url: "/SchoolMaster/Save",
+                type: "POST",
+                data: fd,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    if (res.success) {
+                        alert("Saved Successfully!");
+                        clearForm();
+                        loadTable();
+                    }
+                }
+            });
+        });
+
+        /* -------------------------
+                   EDIT DATA
+        --------------------------*/
+        function edit(id) {
+            $.get("/SchoolMaster/GetById?id=" + id, function (s) {
+                $("#Id").val(s.id);
+                $("#schoolName").val(s.schoolName);
+                $("#schoolCode").val(s.schoolCode);
+                $("#address").val(s.address);
+                $("#city").val(s.city);
+                $("#district").val(s.district);
+                $("#state").val(s.state);
+                $("#officeNumber").val(s.officeNumber);
+                $("#whatsappNumber").val(s.whatsappNumber);
+                $("#emailId").val(s.emailId);
+                $("#contactPerson").val(s.contactPerson);
+                $("#contactNumber").val(s.contactNumber);
+                $("#website").val(s.website);
+
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+        }
+
+        /* -------------------------
+                 DELETE DATA
+        --------------------------*/
+        function remove(id) {
+            if (!confirm("Are you sure you want to delete?")) return;
+
+            $.post("/SchoolMaster/Delete?id=" + id, function (res) {
+                if (res.success) {
+                    alert("Deleted Successfully!");
+                    loadTable();
+                }
+            });
+        }
+
+        /* -------------------------
+                 CLEAR FORM
+        --------------------------*/
+        function clearForm() {
+            $("#schoolForm")[0].reset();
+            $("#Id").val("");
+        }
+
+    </script>
+
+</body>
+</html>

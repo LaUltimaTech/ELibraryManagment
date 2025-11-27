@@ -1,0 +1,259 @@
+﻿Layout = "_Layout";
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Category</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            padding-top: 60px;
+            background: linear-gradient(to bottom right, #f8f9fa, #ffffff);
+            min-height: 100vh;
+        }
+
+        .navbar-text {
+            font-weight: bold;
+        }
+
+        .orange-bar {
+            background: linear-gradient(90deg, #ff7f11, #ff9f1c);
+        }
+
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .form-control {
+            height: 32px !important;
+            font-size: 0.9rem !important;
+        }
+
+        table {
+            margin-top: 25px;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+        }
+
+        td {
+            vertical-align: middle;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar orange-bar fixed-top py-2">
+        <div class="container justify-content-center">
+            <span class="navbar-text h5 text-white mb-0">Book Category</span>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="card p-4">
+            <h5 class="text-primary text-center mb-4">Book Category List</h5>
+
+            <form id="divisionForm" class="text-center">
+                <input type="hidden" id="categoryId">
+                <input type="hidden" id="oldLogoPath">
+
+                <div class="row mb-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label">Book Category Name</label>
+                        <input type="text" class="form-control" id="bookCategoryName" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Logo</label>
+                        <input type="file" class="form-control" id="logo">
+
+                        <!-- PREVIEW IMAGE -->
+                        <img id="logoPreview" src="" width="80" style="margin-top:10px; display:none;" />
+                    </div>
+
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 mt-3">
+                    <button type="reset" class="btn btn-primary" id="btnNew">
+                        <i class="bi bi-plus-circle"></i> New
+                    </button>
+
+                    <button type="submit" class="btn btn-success" id="btnSave">
+                        <i class="bi bi-save"></i> Save
+                    </button>
+
+                    <button onclick="return confirm('Cancel?');" type="reset" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card p-4 mt-4">
+            <div class="row mb-3 justify-content-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" id="searchText" class="form-control" placeholder="Search Category">
+                        <button class="btn btn-info" id="searchBtn">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead>
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Book Category</th>
+                            <th>Image</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="divisionTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        loadCategories();
+
+
+        // 📌 LOAD LIST ----------------------------------------------------
+        function loadCategories() {
+            $.get("/BookCategory/GetAll", function (data) {
+
+                let rows = "";
+                let i = 1;
+
+                data.forEach(x => {
+                    rows += `
+                                <tr>
+                                    <td>${i++}</td>
+                                    <td>${x.name}</td>
+                                    <td><img src="${x.logoPath}" width="60" height="60" /></td>
+
+                                    <td>
+                                        <button class="btn btn-warning btn-sm"
+                                            onclick="editCategory(${x.id})">
+                                          <i class="bi bi-pencil-square"></i> Edit
+                                        </button>
+
+                                        <button class="btn btn-danger btn-sm"
+                                            onclick="deleteCategory(${x.id})">
+                                          <i class="bi bi-trash"></i> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                });
+
+                $("#divisionTable").html(rows);
+            });
+        }
+
+
+        // 📌 SAVE / UPDATE ----------------------------------------------------
+        $("#divisionForm").submit(function (e) {
+            e.preventDefault();
+
+            let id = $("#categoryId").val();
+            let name = $("#bookCategoryName").val();
+            let file = $("#logo")[0].files[0];
+            let oldLogo = $("#oldLogoPath").val();
+
+            let formData = new FormData();
+            formData.append("id", id);
+            formData.append("name", name);
+
+            if (file)
+                formData.append("logo", file);
+            else
+                formData.append("logoPath", oldLogo); // keep old logo
+
+            let url = id === "" ? "/BookCategory/Create" : "/BookCategory/Update";
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+
+                    alert(id === "" ? "Category Added!" : "Category Updated!");
+
+                    loadCategories();
+                    $("#divisionForm")[0].reset();
+                    $("#logoPreview").hide();
+                    $("#categoryId").val("");
+                }
+            });
+
+        });
+
+
+        // 📌 EDIT --------------------------------------------------------------
+        function editCategory(id) {
+
+            $.get("/BookCategory/GetById", { id: id }, function (data) {
+
+                $("#categoryId").val(data.id);
+                $("#bookCategoryName").val(data.name);
+                $("#oldLogoPath").val(data.logoPath);
+
+                if (data.logoPath) {
+                    $("#logoPreview").attr("src", data.logoPath).show();
+                } else {
+                    $("#logoPreview").hide();
+                }
+            });
+        }
+
+
+        // 📌 DELETE ------------------------------------------------------------
+        function deleteCategory(id) {
+
+            if (!confirm("Are you sure want to delete?")) return;
+
+            $.post("/BookCategory/Delete", { id: id }, function () {
+                alert("Category Deleted!");
+                loadCategories();
+            });
+        }
+
+
+        // 📌 SEARCH -----------------------------------------------------------
+        $("#searchBtn").click(function () {
+            let filter = $("#searchText").val().toLowerCase();
+
+            $("#divisionTable tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(filter) > -1)
+            });
+        });
+
+    </script>
+
+</body>
+</html>

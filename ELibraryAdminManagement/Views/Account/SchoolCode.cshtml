@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "SchoolCode";
+}
+
+<h2>Enter School Code</h2>
+
+<form method="post">
+    <div class="mb-3">
+        <label>School Code</label>
+        <input type="text" name="schoolCode" class="form-control" required />
+    </div>
+
+    <button class="btn btn-success">Next</button>
+
+    <p class="text-danger">@ViewBag.Error</p>
+</form>
+
+
+

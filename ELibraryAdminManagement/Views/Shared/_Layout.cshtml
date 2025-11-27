@@ -1,0 +1,283 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>@ViewBag.Title - Admin Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f9;
+            overflow-x: hidden;
+        }
+
+        #sidebar {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            height: calc(100% - 56px);
+            width: 240px;
+            background: linear-gradient(180deg, #343a40, #212529);
+            color: white;
+            overflow-y: auto;
+            transition: all 0.3s;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+            z-index: 999;
+        }
+
+            #sidebar.collapsed {
+                width: 70px;
+            }
+
+            #sidebar ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+                #sidebar ul li {
+                    padding: 12px 20px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    font-size: 15px;
+                    cursor: pointer;
+                    border-left: 4px solid transparent;
+                    transition: 0.3s;
+                }
+
+                    #sidebar ul li a {
+                        color: white;
+                        text-decoration: none;
+                        display: flex;
+                        gap: 10px;
+                        width: 100%;
+                    }
+
+                    #sidebar ul li:hover {
+                        background-color: #495057;
+                        border-left: 4px solid #0d6efd;
+                    }
+
+        .menu-text {
+            white-space: nowrap;
+        }
+
+        #sidebar.collapsed .menu-text {
+            display: none;
+        }
+
+        .navbar-dark {
+            background-color: #212529;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            height: 56px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+        }
+
+        #content {
+            margin-left: 240px;
+            padding: 20px;
+            margin-top: 56px;
+            transition: all 0.3s;
+        }
+
+        #sidebar.collapsed + #content {
+            margin-left: 70px;
+        }
+
+        /* ==============================
+                           REPORT SUBMENU FIX
+                        ===============================*/
+        .submenu {
+            list-style: none;
+            padding-left: 40px;
+            display: none;
+            background: #2b3035;
+        }
+
+            .submenu li a {
+                color: #dee2e6;
+                font-size: 14px;
+                text-decoration: none;
+                display: block;
+                padding: 8px 0;
+            }
+
+        .dropdown-arrow {
+            margin-left: auto;
+            transition: 0.3s;
+        }
+
+        .rotate {
+            transform: rotate(90deg);
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark fixed-top">
+        <button class="btn btn-outline-light" onclick="toggleSidebar()">
+            <i class="bi bi-list"></i>
+        </button>
+        <span class="navbar-brand">Admin Dashboard</span>
+
+        <div class="admin-logo">
+            <span>Admin</span>
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                 style="width:36px;height:36px;border-radius:50%;border:2px solid white">
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <ul class="mt-3">
+
+            <li>
+                <a asp-controller="AdminDashboard" asp-action="Index">
+                    <i class="bi bi-house-door"></i>
+                    <span class="menu-text">Home</span>
+                </a>
+            </li>
+
+            <li>
+                <a asp-controller="SchoolMaster" asp-action="Index">
+                    <i class="bi bi-building"></i>
+                    <span class="menu-text">Schools</span>
+                </a>
+            </li>
+
+            <li>
+                <a asp-controller="StandardMaster" asp-action="Index">
+                    <i class="bi bi-building"></i>
+                    <span class="menu-text">Standard</span>
+                </a>
+            </li>
+
+            <li>
+                <a asp-controller="DivisionMaster" asp-action="Index">
+                    <i class="bi bi-person-badge"></i>
+                    <span class="menu-text">Division</span>
+                </a>
+            </li>
+
+            <li>
+                <a asp-controller="BookMaster" asp-action="Index">
+                    <i class="bi bi-book"></i>
+                    <span class="menu-text">Books</span>
+                </a>
+            </li>
+
+            <li>
+                <a asp-controller="BookCategory" asp-action="Index">
+                    <i class="bi bi-book"></i>
+                    <span class="menu-text">Book Category</span>
+                </a>
+            </li>
+
+            <li>
+                <a asp-controller="StudentMaster" asp-action="Index">
+                    <i class="bi bi-book"></i>
+                    <span class="menu-text">Student</span>
+                </a>
+            </li>
+
+            <li>
+                <a asp-controller="TeacherMaster" asp-action="Index">
+                    <i class="bi bi-book"></i>
+                    <span class="menu-text">Teacher</span>
+                </a>
+            </li>
+
+            <!-- REPORT DROPDOWN (UPDATED) -->
+            <li onclick="toggleSubmenu(this)">
+                <i class="bi bi-bar-chart-line"></i>
+                <span class="menu-text">Reports</span>
+                <i class="bi bi-chevron-right dropdown-arrow"></i>
+            </li>
+
+            <ul class="submenu">
+
+                <li>
+                    <a asp-controller="Reports" asp-action="StudentDetails">
+                        Student Details Report
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Reports" asp-action="TeacherDetails">
+                        Teacher Details Report
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Reports" asp-action="BookReadStudents">
+                        Student Book Read Report
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Reports" asp-action="BookReadTeachers">
+                        Teacher Book Read Report
+                    </a>
+                </li>
+
+            </ul>
+
+            <li>
+                <a asp-controller="Book" asp-action="Index">
+                    <i class="bi bi-book"></i>
+                    <span class="menu-text">Settings</span>
+                </a>
+            </li>
+
+            <li>
+                <a asp-controller="UserMaster" asp-action="Login">
+                    <i class="bi bi-box-arrow-left"></i>
+                    <span class="menu-text">Logout</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content">
+        @RenderBody()
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("collapsed");
+        }
+
+        /* FIXED REPORTS SUBMENU */
+        function toggleSubmenu(menuItem) {
+            let submenu = menuItem.nextElementSibling;
+            let arrow = menuItem.querySelector(".dropdown-arrow");
+
+            if (submenu.style.display === "block") {
+                submenu.style.display = "none";
+                arrow.classList.remove("rotate");
+            } else {
+                submenu.style.display = "block";
+                arrow.classList.add("rotate");
+            }
+        }
+    </script>
+
+</body>
+</html>

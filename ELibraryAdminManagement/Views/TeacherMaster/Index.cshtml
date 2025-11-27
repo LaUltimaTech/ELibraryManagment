@@ -1,0 +1,181 @@
+﻿@{
+    ViewData["Title"] = "Teacher Master";
+    
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<div class="container mt-4">
+
+    <h3 class="text-primary mb-3">Teacher Master</h3>
+
+    <!-- FORM -->
+    <form id="teacherForm" class="border p-3 rounded bg-light">
+
+        <input type="hidden" id="Id" />
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Teacher Name</label>
+                <input type="text" id="TeacherName" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+                <label>School</label>
+                <select id="SchoolId" class="form-select">
+                    <option value="">-- Select --</option>
+                    @foreach (var s in ViewBag.Schools)
+                    {
+                        <option value="@s.Id">@s.SchoolName</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Date of Birth</label>
+                <input type="date" id="DateOfBirth" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label>Email</label>
+                <input type="email" id="EmailId" class="form-control">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label>Address</label>
+            <textarea id="Address" class="form-control"></textarea>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>City</label>
+                <input type="text" id="City" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label>District</label>
+                <input type="text" id="District" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label>State</label>
+                <input type="text" id="State" class="form-control">
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>Mobile</label>
+                <input type="text" id="MobileNumber" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label>Whatsapp</label>
+                <input type="text" id="WhatsappNumber" class="form-control">
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-success" onclick="Save()">Save</button>
+        <button type="reset" class="btn btn-secondary">New</button>
+
+    </form>
+
+    <!-- TABLE -->
+    <table class="table table-bordered mt-4" id="teacherTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Teacher</th>
+                <th>School</th>
+                <th>Mobile</th>
+                <th>Email</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+    </table>
+
+</div>
+
+<script>
+
+    var table = $("#teacherTable").DataTable({
+        ajax: "/TeacherMaster/GetList",
+        columns: [
+            { data: "id" },
+            { data: "teacherName" },
+            { data: "school.schoolName" },
+            { data: "mobileNumber" },
+            { data: "emailId" },
+            {
+                data: "id",
+                render: id => `
+                            <button class='btn btn-warning btn-sm' onclick='Edit(${id})'>Edit</button>
+                            <button class='btn btn-danger btn-sm' onclick='Delete(${id})'>Delete</button>
+                        `
+            }
+        ]
+    });
+
+    // ================= SAVE =================
+    function Save() {
+
+        var dob = $("#DateOfBirth").val();
+        var school = $("#SchoolId").val();
+
+        var obj = {
+            Id: $("#Id").val() || 0,
+            TeacherName: $("#TeacherName").val(),
+            SchoolId: school ? parseInt(school) : 0,
+            DateOfBirth: dob ? dob : "1900-01-01",
+            EmailId: $("#EmailId").val(),
+            Address: $("#Address").val(),
+            City: $("#City").val(),
+            District: $("#District").val(),
+            State: $("#State").val(),
+            MobileNumber: $("#MobileNumber").val(),
+            WhatsappNumber: $("#WhatsappNumber").val(),
+            CreatedDate: new Date().toISOString()
+        };
+
+        $.post("/TeacherMaster/Save", obj, function (res) {
+            if (res.success) {
+                alert("Saved Successfully");
+                $("#teacherForm")[0].reset();
+                table.ajax.reload();
+            } else {
+                alert(res.message);
+            }
+        });
+    }
+
+    // ================= EDIT =================
+    function Edit(id) {
+        $.get("/TeacherMaster/Edit/" + id, function (res) {
+            $("#Id").val(res.id);
+            $("#TeacherName").val(res.teacherName);
+            $("#SchoolId").val(res.schoolId);
+            $("#DateOfBirth").val(res.dateOfBirth.split("T")[0]);
+            $("#EmailId").val(res.emailId);
+            $("#Address").val(res.address);
+            $("#City").val(res.city);
+            $("#District").val(res.district);
+            $("#State").val(res.state);
+            $("#MobileNumber").val(res.mobileNumber);
+            $("#WhatsappNumber").val(res.whatsappNumber);
+        });
+    }
+
+    // ================= DELETE =================
+    function Delete(id) {
+        if (!confirm("Delete this record?")) return;
+
+        $.post("/TeacherMaster/Delete/" + id, function (res) {
+            if (res.success) table.ajax.reload();
+        });
+    }
+
+</script>

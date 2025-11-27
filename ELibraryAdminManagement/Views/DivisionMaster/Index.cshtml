@@ -1,0 +1,215 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Division</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            padding-top: 60px;
+            background: linear-gradient(to bottom right, #f8f9fa, #ffffff);
+            min-height: 100vh;
+        }
+
+        .navbar-text {
+            font-weight: bold;
+        }
+
+        .orange-bar {
+            background: linear-gradient(90deg, #ff7f11, #ff9f1c);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .card {
+            background-color: #fff;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+            border: none;
+            border-radius: 12px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #080808;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            height: 32px !important;
+            padding: 4px 8px !important;
+            font-size: 0.9rem !important;
+            border-radius: 6px !important;
+        }
+
+        .btn-custom {
+            border: none;
+            color: white !important;
+            padding: 6px 20px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+            font-weight: 500;
+        }
+
+        table {
+            margin-top: 25px;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+        }
+
+        td {
+            vertical-align: middle;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <nav class="navbar orange-bar fixed-top py-2">
+        <div class="container justify-content-center">
+            <span class="navbar-text h5 text-white mb-0">Division</span>
+        </div>
+    </nav>
+
+    <!-- Main Form -->
+    <div class="container mt-5">
+        <div class="card p-4">
+            <h5 class="text-primary text-center mb-4">Add New Division</h5>
+
+            <form id="divisionForm" class="text-center">
+
+                <input type="hidden" id="divisionId">
+
+                <div class="row justify-content-center mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Division Name</label>
+                        <input type="text" class="form-control" id="divisionName" placeholder="Enter division name" required>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-center gap-3 mt-3 flex-wrap">
+                    <button type="button" class="btn btn-primary" onclick="clearForm()">
+                        <i class="bi bi-plus-circle"></i> New
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Save
+                    </button>
+                    <button type="reset" class="btn btn-secondary" onclick="clearForm()">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="card p-4 mt-4">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Division Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="divisionTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS / AJAX -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        /* Load all data on page load */
+        $(document).ready(function () {
+            loadDivisions();
+        });
+
+        /* Load all rows from DB */
+        function loadDivisions() {
+            $.get("/DivisionMaster/GetAll", function (data) {
+                let rows = "";
+                let count = 1;
+
+                data.forEach(x => {
+                    rows += `
+                    <tr>
+                        <td>${count++}</td>
+                        <td>${x.divisionName}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editDivision(${x.id}, '${x.divisionName}')">
+                                <i class="bi bi-pencil-square"></i> Update
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteDivision(${x.id})">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+
+                $("#divisionTable").html(rows);
+            });
+        }
+
+        /* Save (Insert or Update) */
+        $("#divisionForm").submit(function (e) {
+            e.preventDefault();
+
+            const model = {
+                Id: $("#divisionId").val() == "" ? 0 : $("#divisionId").val(),
+                DivisionName: $("#divisionName").val()
+            };
+
+            $.post("/DivisionMaster/Save", model, function (res) {
+                alert("Saved Successfully!");
+                clearForm();
+                loadDivisions();
+            });
+        });
+
+        /* Fill form when user clicks Update */
+        function editDivision(id, name) {
+            $("#divisionId").val(id);
+            $("#divisionName").val(name);
+        }
+
+        /* Delete record */
+        function deleteDivision(id) {
+            if (!confirm("Are you sure you want to delete this record?"))
+                return;
+
+            $.post("/DivisionMaster/Delete", { id: id }, function () {
+                alert("Deleted Successfully!");
+                loadDivisions();
+            });
+        }
+
+        /* Clear form */
+        function clearForm() {
+            $("#divisionId").val("");
+            $("#divisionName").val("");
+        }
+
+    </script>
+
+</body>
+</html>
