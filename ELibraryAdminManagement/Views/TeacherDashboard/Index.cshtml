@@ -1,0 +1,205 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f6f7fb;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* ----- LEFT SIDEBAR ----- */
+        .sidebar {
+            width: 120px;
+            height: 100vh;
+            background: #000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+            text-align: center;
+        }
+
+            .sidebar h6 {
+                color: #ffbb33;
+                font-weight: 700;
+                margin-bottom: 20px;
+            }
+
+        .letter-box {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+            .letter-box a {
+                background: #1c1c1c;
+                padding: 6px 0;
+                margin: 2px 10px;
+                border-radius: 6px;
+                color: white;
+                font-weight: 600;
+                transition: 0.2s;
+                text-decoration: none;
+            }
+
+                .letter-box a:hover {
+                    background: #ffbb33;
+                    color: black;
+                }
+
+        /* ----- TOP BAR ----- */
+        .top-bar {
+            margin-left: 140px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+
+            .top-bar h2 {
+                color: #ff9900;
+                font-weight: 700;
+            }
+
+        /* ----- MAIN CONTENT ----- */
+        .main-area {
+            margin-left: 140px;
+            padding: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Category Cards */
+        .category-card {
+            width: 180px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding-bottom: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+            .category-card:hover {
+                transform: translateY(-6px);
+            }
+
+            .category-card img {
+                width: 100%;
+                border-top-left-radius: 16px;
+                border-top-right-radius: 16px;
+            }
+
+            .category-card h5 {
+                margin-top: 10px;
+                font-size: 18px;
+                color: #7db641;
+            }
+
+        /* ----- RIGHT PANEL ----- */
+        .right-panel {
+            width: 280px;
+            background: #fff;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+            height: fit-content;
+        }
+
+            .right-panel h5 {
+                color: #7db641;
+                font-weight: 700;
+            }
+
+        .logout {
+            margin-top: 40px;
+            color: red;
+            cursor: pointer;
+        }
+
+            .logout i {
+                font-size: 40px;
+            }
+
+        .change-password {
+            margin-top: 20px;
+            color: #00b894;
+            cursor: pointer;
+        }
+
+            .change-password i {
+                font-size: 35px;
+            }
+    </style>
+</head>
+
+<body>
+
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar">
+        <h6>Book<br>Categories</h6>
+
+        <div class="letter-box">
+            @foreach (var c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+            {
+                <a href="#">@c</a>
+            }
+        </div>
+    </div>
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <h2>Categories - A</h2>
+
+        <div class="input-group" style="width: 300px;">
+            <input type="text" class="form-control" placeholder="Enter Book Name" />
+            <button class="btn btn-success">Search</button>
+        </div>
+    </div>
+
+    <!-- MAIN AREA -->
+    <div class="main-area">
+
+        <!-- Category Card -->
+        <div class="category-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/201/201818.png">
+            <h5>Art</h5>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+            <h5>@ViewBag.SchoolName</h5>
+
+            <p class="text-muted mt-3">
+                <b>Last Login</b><br>
+                @DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            </p>
+
+            <div class="logout" onclick="window.location.href='/Account/Logout'">
+                <i class="bi bi-power"></i>
+                <div>Logout</div>
+            </div>
+
+            <div class="change-password" onclick="window.location.href='/Account/ChangePassword'">
+                <i class="bi bi-key-fill"></i>
+                <div>Change Password</div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

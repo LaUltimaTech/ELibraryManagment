@@ -16,6 +16,9 @@ namespace ELibraryAdminManagement.Data
         public DbSet<StudentMaster> StudentMasters { get; set; }
         public DbSet<TeacherMaster> TeacherMasters { get; set; }
 
+        public DbSet<Users> Users { get; set; }
+
+
         //public DbSet<Book> Books { get; set; }
         //public DbSet<BookCategory> BookCategory { get; set; }
 

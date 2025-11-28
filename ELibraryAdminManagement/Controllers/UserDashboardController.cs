@@ -4,12 +4,13 @@ public class UserDashboardController : Controller
 {
     public IActionResult Index()
     {
-        var role = HttpContext.Session.GetString("Role");
+        // Session login role 
+        var role = HttpContext.Session.GetString("Role");   // Student / Teacher
+        var school = HttpContext.Session.GetString("SchoolName");
 
-        // ONLY Student or Teacher
-        if (role != "Student" && role != "Teacher")
-            return RedirectToAction("SchoolCode", "Account");
+        ViewBag.Role = role;
+        ViewBag.School = school;
 
-        return View();
+        return View();   // ← Default = Index.cshtml (Perfect)
     }
 }

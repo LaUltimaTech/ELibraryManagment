@@ -1,0 +1,184 @@
+﻿@{
+    ViewBag.Title = "Login";
+    Layout = null; // Standalone login page
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('/images/school image.webp');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+            body::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 0;
+            }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            width: 700px; /* Medium card width */
+            max-width: 90%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .img-side {
+            flex: 1;
+            background-image: url('/images/books.webp');
+            background-size: cover;
+            background-position: center;
+            min-width: 200px;
+        }
+
+        .form-side {
+            flex: 1;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            align-self: center;
+        }
+
+        .form-side h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+            .form-side h2::after {
+                content: '';
+                position: absolute;
+                width: 50%;
+                height: 3px;
+                left: 25%;
+                bottom: -8px;
+                background: #2563eb;
+                border-radius: 2px;
+            }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+            margin-top: 15px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.9);
+        }
+
+            input:focus {
+                border-color: #2563eb;
+                box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+            }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background-color: #2563eb;
+            color: #fff;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+            button:hover {
+                background-color: #1d4ed8;
+            }
+
+       @@media (max-width: 768px) {
+            .container 
+
+        {
+            flex-direction: column;
+            width: 90%;
+        }
+
+        .img-side {
+            height: 180px;
+            width: 100%;
+        }
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="img-side"></div>
+
+        <div class="form-side">
+@*             <img class="login-icon" src="@Url.Content("~/img/bookimg.jpg")" alt="Login Icon">
+ *@
+            <h2>Login</h2>
+
+            <form asp-action="Login" method="post" id="loginForm">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required />
+
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required />
+
+                <button type="submit">Login</button>
+
+                @if (ViewBag.Error != null)
+                {
+                    <p style="color:red; text-align:center; margin-top:10px;">@ViewBag.Error</p>
+                }
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!username || !password) {
+                e.preventDefault();
+                alert("Please enter both username and password.");
+            }
+        });
+    </script>
+</body>
+</html>
